@@ -9,8 +9,8 @@ import reactor.core.publisher.toFlux
 class ReactiveHandler(val repo: MarkerRepo) {
     fun getMarkers(uuid: String): Flux<Marker> =
             repo.get(uuid).toFlux()
-    fun addMarkers(uuid: String, mono : Mono<Marker>) =
-            mono.subscribe({marker -> repo.add(uuid, marker) })
+    fun addMarkers(uuid: String, mono : Mono<Marker>) {
+            mono.subscribe({marker -> repo.add(uuid, marker) }) }
     fun getAllMarkers(): Flux<Marker> =
             repo.getAll().toFlux()
 }
@@ -18,9 +18,18 @@ class ReactiveHandler(val repo: MarkerRepo) {
 @Component
 class MarkerRepo {
     private val entities = mutableMapOf<String, MutableList<Marker>>()
-    fun add(uuid: String, marker : Marker) = entities.getOrPut(uuid, { mutableListOf() }).add(marker)
-    fun get(uuid: String) = entities.getOrDefault(uuid, mutableListOf())
-    fun getAll() = entities.flatMap { it.value }
+    fun add(uuid: String, marker : Marker) {
+        println("ajouté : $uuid")
+        entities.getOrPut(uuid, { mutableListOf() }).add(marker)
+    }
+    fun get(uuid: String) : List<Marker> {
+        println("lue : $uuid")
+        return entities.getOrDefault(uuid, mutableListOf())
+    }
+    fun getAll() : List<Marker> {
+        println("tout : $entities")
+        return entities.flatMap { it.value }
+    }
 }
 
-data class Marker(val lat : String, val lon : String)
+data class Marker(val lat : String, val lng : String)

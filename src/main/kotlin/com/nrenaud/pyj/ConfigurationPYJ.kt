@@ -2,12 +2,16 @@ package com.nrenaud.pyj
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.web.reactive.config.CorsRegistration
 import org.springframework.web.reactive.function.server.*
 
 @SpringBootApplication
 class ConfigurationPYJ {
 
     val searchByid = "uuid"
+
+    @Bean
+    fun cors() = CorsRegistration("/**")
 
     @Bean
     fun routerFunction(handler: ReactiveHandler):
@@ -26,7 +30,7 @@ class ConfigurationPYJ {
             POST("/{$searchByid}") { req ->
                 val uuid = req.pathVariable(searchByid)
                 val markerToAdd = req.bodyToMono(Marker::class.java)
-                System.out.println("Ajouter pour $searchByid")
+                println("Ajouter pour $uuid")
                 handler.addMarkers(uuid, markerToAdd)
                 ServerResponse.ok().build()
             }
