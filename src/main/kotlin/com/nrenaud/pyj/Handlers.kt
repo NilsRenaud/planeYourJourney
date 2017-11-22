@@ -1,5 +1,6 @@
 package com.nrenaud.pyj
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -17,17 +18,22 @@ class ReactiveHandler(val repo: MarkerRepo) {
 
 @Component
 class MarkerRepo {
+
+    companion object {
+        val LOG = LoggerFactory.getLogger(this::class.java)
+    }
+
     private val entities = mutableMapOf<String, MutableList<Marker>>()
     fun add(uuid: String, marker : Marker) {
-        println("ajouté : $uuid")
+        LOG.debug("ajouté : $uuid")
         entities.getOrPut(uuid, { mutableListOf() }).add(marker)
     }
     fun get(uuid: String) : List<Marker> {
-        println("lue : $uuid")
+        LOG.debug("lue : $uuid")
         return entities.getOrDefault(uuid, mutableListOf())
     }
     fun getAll() : List<Marker> {
-        println("tout : $entities")
+        LOG.debug("tout : $entities")
         return entities.flatMap { it.value }
     }
 }

@@ -5,6 +5,8 @@ buildscript {
     ext {
         kotlinVersion = '1.1.4-3'
         springBootVersion = '2.0.0.M6'
+        slf4jVersion = '1.7.25'
+        logbackVersion = '1.2.3'
     }
     repositories {
         mavenCentral()
@@ -45,6 +47,9 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-webflux:${springBootVersion}")
     compile("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    compile("org.slf4j:slf4j-api:${slf4jVersion}")
+
+    runtime("ch.qos.logback:logback-classic:${logbackVersion}")
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('io.projectreactor:reactor-test')

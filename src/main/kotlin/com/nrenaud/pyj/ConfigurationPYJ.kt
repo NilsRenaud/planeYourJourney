@@ -1,17 +1,21 @@
 package com.nrenaud.pyj
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.web.reactive.config.CorsRegistration
 import org.springframework.web.reactive.function.server.*
+import kotlin.reflect.jvm.internal.impl.load.java.structure.JavaClass
 
 @SpringBootApplication
 class ConfigurationPYJ {
 
     val searchByid = "uuid"
 
-    @Bean
-    fun cors() = CorsRegistration("/**")
+    companion object {
+        val LOG = LoggerFactory.getLogger(this::class.java)
+    }
 
     @Bean
     fun routerFunction(handler: ReactiveHandler):
@@ -19,18 +23,18 @@ class ConfigurationPYJ {
 
         ("/api").nest {
             GET("/") {
-                System.out.println("TOUT LISTER")
+                LOG.debug("TOUT LISTER")
                 ServerResponse.ok().body(handler.getAllMarkers())
             }
             GET("/{$searchByid}") { req ->
                 val uuid = req.pathVariable(searchByid)
-                System.out.println("TOUT LISTER pour $searchByid")
+                LOG.debug("TOUT LISTER pour $searchByid")
                 ServerResponse.ok().body(handler.getMarkers(uuid))
             }
             POST("/{$searchByid}") { req ->
                 val uuid = req.pathVariable(searchByid)
                 val markerToAdd = req.bodyToMono(Marker::class.java)
-                println("Ajouter pour $uuid")
+                LOG.debug("Ajouter pour $uuid")
                 handler.addMarkers(uuid, markerToAdd)
                 ServerResponse.ok().build()
             }
