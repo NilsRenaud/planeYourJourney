@@ -1,4 +1,4 @@
-package com.nrenaud.pyj
+package com.nrenaud.pyj.filters
 
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
