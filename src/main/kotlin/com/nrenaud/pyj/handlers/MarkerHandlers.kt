@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 
 @Component
 class MarkerHandlers(private val service: MarkerService) {
@@ -30,7 +31,14 @@ class MarkerHandlers(private val service: MarkerService) {
     fun saveMarker(req : ServerRequest) : Mono<ServerResponse> {
         val uuid = req.pathVariable("uuid")
         LOG.debug("Add new marker for [$uuid]")
-        service.addMarker(uuid, req.bodyToMono(MarkerDto::class.java))
-        return ServerResponse.ok().build()
+        return ServerResponse.ok().body(service.addMarker(uuid, req.bodyToMono(MarkerDto::class.java)))
     }
+
+    fun updateMarker(req : ServerRequest) : Mono<ServerResponse> {
+        val uuid = req.pathVariable("uuid")
+        LOG.debug("Update marker for [$uuid]")
+        return service.updateMarker(uuid, req.bodyToMono(MarkerDto::class.java))
+                .then(ServerResponse.ok().build())
+    }
+
 }

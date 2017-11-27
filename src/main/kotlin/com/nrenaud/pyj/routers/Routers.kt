@@ -16,6 +16,7 @@ class Routers(private val handler : MarkerHandlers) {
             GET("/", handler::getAllMarkers)
             GET("/{uuid}", handler::getMarkerForUuid)
             POST("/{uuid}", handler::saveMarker)
+            PUT("/{uuid}/markers", handler::updateMarker)
         }
     }
 }
