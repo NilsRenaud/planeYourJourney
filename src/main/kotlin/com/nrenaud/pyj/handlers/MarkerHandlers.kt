@@ -9,7 +9,6 @@ import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
 
 @Component
 class MarkerHandlers(private val service: MarkerService) {
@@ -17,28 +16,24 @@ class MarkerHandlers(private val service: MarkerService) {
         val LOG: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    fun getAllMarkers(req : ServerRequest): Mono<ServerResponse> {
-        LOG.debug("List all markers.")
-       return ServerResponse.ok().body(service.findAll())
+    fun getMarkers(req: ServerRequest): Mono<ServerResponse> {
+        val gUuid = req.queryParam("group")
+
+        LOG.debug("List all markers for : [$gUuid]")
+
+        return ServerResponse.ok().body(
+                when (gUuid.isPresent) {
+                    true -> service.getMarkers(gUuid.get())
+                    false -> service.findAll()
+                })
     }
 
-    fun getMarkerForUuid(req : ServerRequest): Mono<ServerResponse> {
-        val uuid = req.pathVariable("uuid")
-        LOG.debug("List all markers for [$uuid]")
-        return ServerResponse.ok().body(service.getMarkers(uuid))
+    fun saveMarker(req: ServerRequest): Mono<ServerResponse> {
+        return ServerResponse.ok().body(service.addMarker(req.bodyToMono(MarkerDto::class.java)))
     }
 
-    fun saveMarker(req : ServerRequest) : Mono<ServerResponse> {
-        val uuid = req.pathVariable("uuid")
-        LOG.debug("Add new marker for [$uuid]")
-        return ServerResponse.ok().body(service.addMarker(uuid, req.bodyToMono(MarkerDto::class.java)))
-    }
-
-    fun updateMarker(req : ServerRequest) : Mono<ServerResponse> {
-        val uuid = req.pathVariable("uuid")
-        LOG.debug("Update marker for [$uuid]")
-        return service.updateMarker(uuid, req.bodyToMono(MarkerDto::class.java))
+    fun updateMarker(req: ServerRequest): Mono<ServerResponse> {
+        return service.updateMarker(req.bodyToMono(MarkerDto::class.java))
                 .then(ServerResponse.ok().build())
     }
-
 }

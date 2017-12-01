@@ -3,22 +3,22 @@ package com.nrenaud.pyj.service
 import com.nrenaud.pyj.models.Marker
 import com.nrenaud.pyj.models.MarkerDto
 import com.nrenaud.pyj.repostories.MarkerRepository
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.*
 
-@Component
+@Service
 class MarkerService(private val repo : MarkerRepository) {
 
-    fun addMarker(groupUuid: String, markerToAdd: Mono<MarkerDto>) : Mono<MarkerDto> {
-        return markerToAdd.map { it.toDbEntity(groupUuid) }
+    fun addMarker(markerToAdd: Mono<MarkerDto>) : Mono<MarkerDto> {
+        return markerToAdd.map { it.toDbEntity() }
                 .flatMap {repo.insert(it)}
                 .map { it.toDto() }
     }
 
-    fun updateMarker(groupUuid: String, markerToAdd: Mono<MarkerDto>) : Mono<Void>{
-        return markerToAdd.map { it.toDbEntity(groupUuid) }
+    fun updateMarker(markerToAdd: Mono<MarkerDto>) : Mono<Void>{
+        return markerToAdd.map { it.toDbEntity() }
                 .flatMap {repo.save(it)}
                 .then()
     }
@@ -28,8 +28,8 @@ class MarkerService(private val repo : MarkerRepository) {
     fun findAll() : Flux<MarkerDto>  = repo.findAll().map { it.toDto() }
 }
 
-fun Marker.toDto() = MarkerDto(this.id, this.lat, this.lng)
+fun Marker.toDto() = MarkerDto(this.id, this.groupId, this.name, this.interestId, this.lat, this.lng)
 
-fun MarkerDto.toDbEntity(groupUuid :String) =
-        Marker(groupUuid, this.lat, this.lng, this.id?: UUID.randomUUID().toString())
+fun MarkerDto.toDbEntity() =
+        Marker(this.id?: UUID.randomUUID().toString(), this.groupId, this.name, this.interestId, this.lat, this.lng)
 

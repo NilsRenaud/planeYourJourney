@@ -13,10 +13,9 @@ class Routers(private val handler : MarkerHandlers) {
     fun markerRouter():
             RouterFunction<ServerResponse> = router {
         ("/api" and accept(APPLICATION_JSON)).nest {
-            GET("/", handler::getAllMarkers)
-            GET("/{uuid}", handler::getMarkerForUuid)
-            POST("/{uuid}", handler::saveMarker)
-            PUT("/{uuid}/markers", handler::updateMarker)
+            GET("/markers", handler::getMarkers)
+            POST("/markers", handler::saveMarker)
+            PUT("/markers", handler::updateMarker)
         }
     }
 }
